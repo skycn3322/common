@@ -700,6 +700,11 @@ TIME r "修改IP、DNS、网关，请输入命令：openwrt"
 TIME r "如果您的机子在线更新固件可用，而又编译了，也可请输入命令查看在线更新操作：openwrt"
 }
 
+cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c > CPU
+cat /proc/cpuinfo | grep "cpu cores" | uniq >> CPU
+sed -i 's|[[:space:]]||g; s|^.||' CPU && sed -i 's|CPU||g; s|pucores:||' CPU
+CPUNAME="$(awk 'NR==1' CPU)" && CPUCORES="$(awk 'NR==2' CPU)"
+rm -rf CPU
 
 function Diy_xinxi() {
 Plug_in="$(grep -i 'CONFIG_PACKAGE_luci-app' $HOME_PATH/.config && grep -i 'CONFIG_PACKAGE_luci-theme' $HOME_PATH/.config)"
@@ -807,6 +812,7 @@ TIME z " 系统空间      类型   总数  已用  可用 使用率"
 cd ../ && df -hT $PWD && cd $HOME_PATH
 echo
 echo
+TIME z " 本编译 服务器的 CPU型号为 [ ${CPUNAME} ]"
 if [ -n "$(ls -A "${HOME_PATH}/EXT4" 2>/dev/null)" ]; then
   chmod -R +x ${HOME_PATH}/EXT4
   source ${HOME_PATH}/EXT4
